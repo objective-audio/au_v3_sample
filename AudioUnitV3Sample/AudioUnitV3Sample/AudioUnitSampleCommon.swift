@@ -43,53 +43,29 @@ func fillSine(out_data: UnsafeMutablePointer<Float32>, length: AVAudioFrameCount
 
 public typealias KernelRenderBlock = (buffer: AVAudioPCMBuffer) -> Void
 
-class AudioUnitSampleKernel {
-    var buffer: AVAudioPCMBuffer? {
+class Atomic<T> {
+    init(val: T) {
+        self._value = val
+    }
+    
+    var value: T {
         get {
             objc_sync_enter(self)
-            let result = _buffer
+            let result = _value
             objc_sync_exit(self)
             return result
         }
         set {
             objc_sync_enter(self)
-            _buffer = newValue
+            _value = newValue
             objc_sync_exit(self)
         }
     }
     
-    var renderBlock: KernelRenderBlock? {
-        get {
-            objc_sync_enter(self)
-            let result = _renderBlock
-            objc_sync_exit(self)
-            return result
-        }
-        set {
-            objc_sync_enter(self)
-            _renderBlock = newValue
-            objc_sync_exit(self)
-        }
-    }
-    
-    private var _buffer: AVAudioPCMBuffer?
-    private var _renderBlock: KernelRenderBlock?
+    private var _value: T
 }
 
-class DelayInfo {
-    var level: Float {
-        get {
-            objc_sync_enter(self)
-            let result = _level
-            objc_sync_exit(self)
-            return result
-        }
-        set {
-            objc_sync_enter(self)
-            _level = newValue
-            objc_sync_exit(self)
-        }
-    }
-    
-    private var _level: Float = 0.0
+class AudioUnitSampleKernel {
+    var buffer = Atomic<AVAudioPCMBuffer?>(val: nil)
+    var renderBlock = Atomic<KernelRenderBlock?>(val: nil)
 }

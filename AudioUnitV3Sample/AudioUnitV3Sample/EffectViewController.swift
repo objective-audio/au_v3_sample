@@ -14,7 +14,7 @@ class EffectViewController: UIViewController {
     @IBOutlet weak var slider: UISlider!
     
     var audioEngine: AVAudioEngine?
-    var delayInfo: DelayInfo?
+    var delayLevel = Atomic<Float>(val: 0.0)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,7 +23,7 @@ class EffectViewController: UIViewController {
     }
     
     @IBAction func sliderValueChanged(sender: UISlider) {
-        delayInfo?.level = sender.value
+        delayLevel.value = sender.value
     }
     
     func setupEffectAudioUnit() {
@@ -38,10 +38,8 @@ class EffectViewController: UIViewController {
         let engine = AVAudioEngine()
         self.audioEngine = engine
         
-        let delayInfo = DelayInfo()
-        self.delayInfo = delayInfo
-        
-        self.slider.value = delayInfo.level
+        let delayLevel = self.delayLevel
+        self.slider.value = delayLevel.value
         
         // AVAudioUnitをインスタンス化する。生成処理が終わるとcompletionHandlerが呼ばれる
         AVAudioUnit.instantiateWithComponentDescription(AudioUnitEffectSample.audioComponentDescription, options: AudioComponentInstantiationOptions(rawValue: 0)) { (audioUnitNode: AVAudioUnit?, err: ErrorType?) in
@@ -77,7 +75,7 @@ class EffectViewController: UIViewController {
             
             effectUnit.kernelRenderBlock = { buffer in
                 // このブロックの中はオーディオのスレッドから呼ばれる
-                let delayLevel = [delayInfo.level]
+                let delayLevel = [delayLevel.value]
                 let format = buffer.format
                 var bufferFrame: AVAudioFrameCount = 0
                 

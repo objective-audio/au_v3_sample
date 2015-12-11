@@ -55,7 +55,7 @@ class AudioUnitEffectSample: AUAudioUnit {
         // オーディオ処理をするブロック
         self._internalRenderBlock = { (actionFlags, timeStamp, frameCount, outputBusNumber, outputData, renderEvent, pullInputBlock) in
             
-            guard let buffer = kernel.buffer else {
+            guard let buffer = kernel.buffer.value else {
                 return noErr
             }
             
@@ -68,7 +68,7 @@ class AudioUnitEffectSample: AUAudioUnit {
             }
             
             // 独自のオーディオ処理をするブロックを呼び出す
-            if let renderBlock = kernel.renderBlock {
+            if let renderBlock = kernel.renderBlock.value {
                 renderBlock(buffer: buffer)
             }
             
@@ -138,23 +138,23 @@ class AudioUnitEffectSample: AUAudioUnit {
         let inputBus = self.inputBusses[0]
         
         if outputBus.format == inputBus.format {
-            _kernel.buffer = AVAudioPCMBuffer(PCMFormat: outputBus.format, frameCapacity: self.maximumFramesToRender)
+            _kernel.buffer.value = AVAudioPCMBuffer(PCMFormat: outputBus.format, frameCapacity: self.maximumFramesToRender)
         }
     }
     
     override func deallocateRenderResources() {
         // Kernelからバッファを解放
-        _kernel.buffer = nil
+        _kernel.buffer.value = nil
     }
     
     // MARK: - Accessor
     
     var kernelRenderBlock: KernelRenderBlock? {
         get {
-            return _kernel.renderBlock
+            return _kernel.renderBlock.value
         }
         set {
-            _kernel.renderBlock = newValue
+            _kernel.renderBlock.value = newValue
         }
     }
 }
