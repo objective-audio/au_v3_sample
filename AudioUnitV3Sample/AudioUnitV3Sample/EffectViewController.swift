@@ -11,12 +11,19 @@ import AVFoundation
 import Accelerate
 
 class EffectViewController: UIViewController {
+    @IBOutlet weak var slider: UISlider!
+    
     var audioEngine: AVAudioEngine?
+    var delayInfo: DelayInfo?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupEffectAudioUnit()
+    }
+    
+    @IBAction func sliderValueChanged(sender: UISlider) {
+        delayInfo?.level = sender.value
     }
     
     func setupEffectAudioUnit() {
@@ -31,14 +38,15 @@ class EffectViewController: UIViewController {
         let engine = AVAudioEngine()
         self.audioEngine = engine
         
+        let delayInfo = DelayInfo()
+        self.delayInfo = delayInfo
+        
+        self.slider.value = delayInfo.level
+        
         // AVAudioUnitをインスタンス化する。生成処理が終わるとcompletionHandlerが呼ばれる
         AVAudioUnit.instantiateWithComponentDescription(AudioUnitEffectSample.audioComponentDescription, options: AudioComponentInstantiationOptions(rawValue: 0)) { (audioUnitNode: AVAudioUnit?, err: ErrorType?) in
             guard let audioUnitNode = audioUnitNode else {
                 print(err)
-                return
-            }
-            
-            guard let inputNode = engine.inputNode else {
                 return
             }
             
@@ -48,18 +56,28 @@ class EffectViewController: UIViewController {
             let sampleRate = AVAudioSession.sharedInstance().sampleRate
             let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)
             
+            guard let url = NSBundle.mainBundle().URLForAuxiliaryExecutable("sine_loop.mp3") else {
+                print(err)
+                return
+            }
+            
+            let playerNode = AVAudioPlayerNode()
+            engine.attachNode(playerNode)
+            
             // 接続
             engine.connect(audioUnitNode, to: engine.mainMixerNode, format: format)
-            engine.connect(inputNode, to: audioUnitNode, format: format)
+            engine.connect(playerNode, to: audioUnitNode, format: format)
             
-            // エフェクトの処理。２秒音を遅らせる
-            let delayBuffer = AVAudioPCMBuffer(PCMFormat: format, frameCapacity: AVAudioFrameCount(format.sampleRate) * 2)
+            // エフェクトの処理（ディレイ）
+            let delayBuffer = AVAudioPCMBuffer(PCMFormat: format, frameCapacity: AVAudioFrameCount(format.sampleRate) / 2)
             delayBuffer.frameLength = delayBuffer.frameCapacity
             var delayFrame: AVAudioFrameCount = 0
             
             let effectUnit = audioUnitNode.AUAudioUnit as! AudioUnitEffectSample
             
             effectUnit.kernelRenderBlock = { buffer in
+                // このブロックの中はオーディオのスレッドから呼ばれる
+                let delayLevel = [delayInfo.level]
                 let format = buffer.format
                 var bufferFrame: AVAudioFrameCount = 0
                 
@@ -69,7 +87,10 @@ class EffectViewController: UIViewController {
                     for ch in 0..<format.channelCount {
                         let bufferData = buffer.floatChannelData[Int(ch)].advancedBy(Int(bufferFrame))
                         let delayData = delayBuffer.floatChannelData[Int(ch)].advancedBy(Int(delayFrame))
-                        vDSP_vswap(bufferData, 1, delayData, 1, vDSP_Length(copyFrame))
+                        let copyLength = vDSP_Length(copyFrame)
+                        vDSP_vsmul(delayData, 1, delayLevel, delayData, 1, copyLength)
+                        vDSP_vswap(bufferData, 1, delayData, 1, copyLength)
+                        vDSP_vadd(bufferData, 1, delayData, 1, bufferData, 1, copyLength)
                     }
                     
                     delayFrame += copyFrame
@@ -81,9 +102,14 @@ class EffectViewController: UIViewController {
             }
             
             do {
+                let audioFile = try AVAudioFile(forReading: url, commonFormat: AVAudioCommonFormat.PCMFormatFloat32, interleaved: false)
+                playerNode.scheduleFile(audioFile, atTime: nil, completionHandler: nil)
+                
                 // スタート
                 try AVAudioSession.sharedInstance().setActive(true)
                 try engine.start()
+                
+                playerNode.play()
             } catch {
                 print(error)
                 return

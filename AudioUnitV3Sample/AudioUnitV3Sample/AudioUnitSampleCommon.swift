@@ -75,3 +75,21 @@ class AudioUnitSampleKernel {
     private var _buffer: AVAudioPCMBuffer?
     private var _renderBlock: KernelRenderBlock?
 }
+
+class DelayInfo {
+    var level: Float {
+        get {
+            objc_sync_enter(self)
+            let result = _level
+            objc_sync_exit(self)
+            return result
+        }
+        set {
+            objc_sync_enter(self)
+            _level = newValue
+            objc_sync_exit(self)
+        }
+    }
+    
+    private var _level: Float = 0.0
+}

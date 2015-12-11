@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B66345F11C1A6B2700983D0D /* sine_loop.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B66345F01C1A6B2700983D0D /* sine_loop.mp3 */; };
 		B6D0D8981C11240300947CC9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D0D8971C11240300947CC9 /* AppDelegate.swift */; };
 		B6D0D89F1C11240300947CC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B6D0D89E1C11240300947CC9 /* Assets.xcassets */; };
 		B6D0D8A21C11240300947CC9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6D0D8A01C11240300947CC9 /* LaunchScreen.storyboard */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B66345F01C1A6B2700983D0D /* sine_loop.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sine_loop.mp3; path = "../../../../../../20151211sample_rhythm/Audio Files/sine_loop.mp3"; sourceTree = "<group>"; };
 		B6D0D8941C11240300947CC9 /* AudioUnitV3Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioUnitV3Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6D0D8971C11240300947CC9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B6D0D89E1C11240300947CC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 		B6D0D8961C11240300947CC9 /* AudioUnitV3Sample */ = {
 			isa = PBXGroup;
 			children = (
+				B66345F01C1A6B2700983D0D /* sine_loop.mp3 */,
 				B6D0D8971C11240300947CC9 /* AppDelegate.swift */,
 				B6D0D8C51C11243600947CC9 /* GeneratorViewController.swift */,
 				B6D0D8C61C11243600947CC9 /* EffectViewController.swift */,
@@ -244,6 +247,7 @@
 				B6D0D8D01C11243600947CC9 /* Main.storyboard in Resources */,
 				B6D0D8A21C11240300947CC9 /* LaunchScreen.storyboard in Resources */,
 				B6D0D89F1C11240300947CC9 /* Assets.xcassets in Resources */,
+				B66345F11C1A6B2700983D0D /* sine_loop.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -492,6 +496,7 @@
 				B6D0D8BE1C11240300947CC9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B6D0D8BF1C11240300947CC9 /* Build configuration list for PBXNativeTarget "AudioUnitV3SampleTests" */ = {
 			isa = XCConfigurationList;
@@ -500,6 +505,7 @@
 				B6D0D8C11C11240300947CC9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		B6D0D8C21C11240300947CC9 /* Build configuration list for PBXNativeTarget "AudioUnitV3SampleUITests" */ = {
 			isa = XCConfigurationList;
@@ -508,6 +514,7 @@
 				B6D0D8C41C11240300947CC9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

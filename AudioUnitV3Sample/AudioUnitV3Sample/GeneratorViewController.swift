@@ -43,6 +43,7 @@ class GeneratorViewController: UIViewController {
             var phase: Float64 = 0.0
             
             generatorUnit.kernelRenderBlock = { buffer in
+                // このブロックの中はオーディオのスレッドから呼ばれる
                 let format = buffer.format
                 let currentPhase: Float64 = phase
                 let phasePerFrame: Float64 = 1000.0 / format.sampleRate * 2.0 * M_PI;
