@@ -54,6 +54,7 @@ class AudioUnitEffectSample: AUAudioUnit {
         
         // オーディオ処理をするブロック
         self._internalRenderBlock = { (actionFlags, timeStamp, frameCount, outputBusNumber, outputData, renderEvent, pullInputBlock) in
+            // このブロックの中はオーディオのスレッドから呼ばれる
             
             guard let buffer = kernel.buffer.value else {
                 return noErr
