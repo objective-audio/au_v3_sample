@@ -73,7 +73,7 @@ class EffectViewController: UIViewController {
             engine.connect(playerNode, to: audioUnitNode, format: format)
             
             // エフェクトの処理（ディレイ）
-            guard let delayBuffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(format.sampleRate) / 2) else {
+            guard let delayBuffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(format.sampleRate) / 4) else {
                 abort()
             }
             delayBuffer.frameLength = delayBuffer.frameCapacity
