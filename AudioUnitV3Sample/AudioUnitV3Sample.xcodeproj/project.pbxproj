@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B66345F11C1A6B2700983D0D /* sine_loop.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B66345F01C1A6B2700983D0D /* sine_loop.mp3 */; };
+		B6A60C471F7BF32F004F2FD4 /* EffectSampleBeat.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B6A60C461F7BF1A8004F2FD4 /* EffectSampleBeat.m4a */; };
 		B6D0D8981C11240300947CC9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D0D8971C11240300947CC9 /* AppDelegate.swift */; };
 		B6D0D89F1C11240300947CC9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B6D0D89E1C11240300947CC9 /* Assets.xcassets */; };
 		B6D0D8A21C11240300947CC9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B6D0D8A01C11240300947CC9 /* LaunchScreen.storyboard */; };
@@ -39,7 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		B66345F01C1A6B2700983D0D /* sine_loop.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = sine_loop.mp3; path = "../../../../../../20151211sample_rhythm/Audio Files/sine_loop.mp3"; sourceTree = "<group>"; };
+		B6A60C461F7BF1A8004F2FD4 /* EffectSampleBeat.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = EffectSampleBeat.m4a; sourceTree = "<group>"; };
 		B6D0D8941C11240300947CC9 /* AudioUnitV3Sample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioUnitV3Sample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6D0D8971C11240300947CC9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B6D0D89E1C11240300947CC9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -107,7 +107,7 @@
 		B6D0D8961C11240300947CC9 /* AudioUnitV3Sample */ = {
 			isa = PBXGroup;
 			children = (
-				B66345F01C1A6B2700983D0D /* sine_loop.mp3 */,
+				B6A60C461F7BF1A8004F2FD4 /* EffectSampleBeat.m4a */,
 				B6D0D8971C11240300947CC9 /* AppDelegate.swift */,
 				B6D0D8C51C11243600947CC9 /* GeneratorViewController.swift */,
 				B6D0D8C61C11243600947CC9 /* EffectViewController.swift */,
@@ -247,7 +247,7 @@
 				B6D0D8D01C11243600947CC9 /* Main.storyboard in Resources */,
 				B6D0D8A21C11240300947CC9 /* LaunchScreen.storyboard in Resources */,
 				B6D0D89F1C11240300947CC9 /* Assets.xcassets in Resources */,
-				B66345F11C1A6B2700983D0D /* sine_loop.mp3 in Resources */,
+				B6A60C471F7BF32F004F2FD4 /* EffectSampleBeat.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,6 +365,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -402,6 +403,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};

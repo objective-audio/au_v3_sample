@@ -28,19 +28,15 @@ class AudioUnitEffectSample: AUAudioUnit {
         componentFlagsMask: 0
     );
     
-    override static func initialize() {
-        struct Static { static var token: dispatch_once_t = 0 }
-        
-        dispatch_once(&Static.token) {
-            // In-Process用なので、Extensionの場合は呼んではいけない
-            AUAudioUnit.registerSubclass(
-                self,
-                asComponentDescription: AudioUnitEffectSample.audioComponentDescription,
-                name: "AudioUnitEffectSample",
-                version: UINT32_MAX
-            )
-        }
-    }
+    static let registerSubclassOnce: Void = {
+        // In-Process用なので、Extensionの場合は呼んではいけない
+        AUAudioUnit.registerSubclass(
+            AudioUnitEffectSample.self,
+            as: AudioUnitEffectSample.audioComponentDescription,
+            name: "AudioUnitEffectSample",
+            version: UINT32_MAX
+        )
+    }()
     
     // MARK: - Override
     
@@ -65,12 +61,12 @@ class AudioUnitEffectSample: AUAudioUnit {
             
             // 入力からオーディオデータを読み込む
             if let pullInputBlock = pullInputBlock {
-                pullInputBlock(actionFlags, timeStamp, frameCount, 0, buffer.mutableAudioBufferList)
+                let _ = pullInputBlock(actionFlags, timeStamp, frameCount, 0, buffer.mutableAudioBufferList)
             }
             
             // 独自のオーディオ処理をするブロックを呼び出す
             if let renderBlock = kernel.renderBlock.value {
-                renderBlock(buffer: buffer)
+                renderBlock(buffer)
             }
             
             // アウトのバッファが元からあればそのまま使い、なければこちらからセットする
@@ -95,11 +91,13 @@ class AudioUnitEffectSample: AUAudioUnit {
             try super.init(componentDescription: componentDescription, options: options)
             
             // formatは仮で、必要な数だけバスを作る
-            let format = AVAudioFormat(standardFormatWithSampleRate: 44100.0, channels: 2)
+            guard let format = AVAudioFormat(standardFormatWithSampleRate: 44100.0, channels: 2) else {
+                abort()
+            }
             let outputBus = try AUAudioUnitBus(format: format)
-            self._outputBusArray = AUAudioUnitBusArray(audioUnit: self, busType: AUAudioUnitBusType.Output, busses: [outputBus])
+            self._outputBusArray = AUAudioUnitBusArray(audioUnit: self, busType: AUAudioUnitBusType.output, busses: [outputBus])
             let inputBus = try AUAudioUnitBus(format: format)
-            self._inputBusArray = AUAudioUnitBusArray(audioUnit: self, busType: AUAudioUnitBusType.Input, busses: [inputBus])
+            self._inputBusArray = AUAudioUnitBusArray(audioUnit: self, busType: AUAudioUnitBusType.input, busses: [inputBus])
             
         } catch {
             throw error
@@ -121,7 +119,7 @@ class AudioUnitEffectSample: AUAudioUnit {
         return self._internalRenderBlock
     }
     
-    override func shouldChangeToFormat(format: AVAudioFormat, forBus bus: AUAudioUnitBus) -> Bool {
+    override func shouldChange(to format: AVAudioFormat, for bus: AUAudioUnitBus) -> Bool {
         // バスが接続されると呼ばれる。対応不可能なフォーマットならfalseを返す
         return true
     }
@@ -139,7 +137,7 @@ class AudioUnitEffectSample: AUAudioUnit {
         let inputBus = self.inputBusses[0]
         
         if outputBus.format == inputBus.format {
-            _kernel.buffer.value = AVAudioPCMBuffer(PCMFormat: outputBus.format, frameCapacity: self.maximumFramesToRender)
+            _kernel.buffer.value = AVAudioPCMBuffer(pcmFormat: outputBus.format, frameCapacity: self.maximumFramesToRender)
         }
     }
     

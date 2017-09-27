@@ -27,19 +27,15 @@ class AudioUnitGeneratorSample: AUAudioUnit {
         componentFlagsMask: 0
     );
     
-    override static func initialize() {
-        struct Static { static var token: dispatch_once_t = 0 }
-        
-        dispatch_once(&Static.token) {
-            // In-Process用なので、Extensionの場合は呼んではいけない
-            AUAudioUnit.registerSubclass(
-                self,
-                asComponentDescription: AudioUnitGeneratorSample.audioComponentDescription,
-                name: "AudioUnitGeneratorSample",
-                version: UINT32_MAX
-            )
-        }
-    }
+    static let registerSubclassOnce: Void = {
+        // In-Process用なので、Extensionの場合は呼んではいけない
+        AUAudioUnit.registerSubclass(
+            AudioUnitGeneratorSample.self,
+            as: AudioUnitGeneratorSample.audioComponentDescription,
+            name: "AudioUnitGeneratorSample",
+            version: UINT32_MAX
+        )
+    }()
     
     // MARK: - Override
     
@@ -64,7 +60,7 @@ class AudioUnitGeneratorSample: AUAudioUnit {
             
             // 独自のオーディオ処理をするブロックを呼び出す
             if let renderBlock = kernel.renderBlock.value {
-                renderBlock(buffer: buffer)
+                renderBlock(buffer)
             }
             
             // アウトのバッファが元からあればそのまま使ってコピーをし、なければこちらのバッファをセットする
@@ -89,9 +85,11 @@ class AudioUnitGeneratorSample: AUAudioUnit {
             try super.init(componentDescription: componentDescription, options: options)
             
             // formatは仮で、必要な数だけバスを作る
-            let format = AVAudioFormat(standardFormatWithSampleRate: 44100.0, channels: 2)
+            guard let format = AVAudioFormat(standardFormatWithSampleRate: 44100.0, channels: 2) else {
+                abort()
+            }
             let bus = try AUAudioUnitBus(format: format)
-            self._outputBusArray = AUAudioUnitBusArray(audioUnit: self, busType: AUAudioUnitBusType.Output, busses: [bus])
+            self._outputBusArray = AUAudioUnitBusArray(audioUnit: self, busType: AUAudioUnitBusType.output, busses: [bus])
         } catch {
             throw error
         }
@@ -107,7 +105,7 @@ class AudioUnitGeneratorSample: AUAudioUnit {
         return self._internalRenderBlock
     }
     
-    override func shouldChangeToFormat(format: AVAudioFormat, forBus bus: AUAudioUnitBus) -> Bool {
+    override func shouldChange(to format: AVAudioFormat, for bus: AUAudioUnitBus) -> Bool {
         // バスが接続されると呼ばれる。対応不可能なフォーマットならfalseを返す
         return true
     }
@@ -122,7 +120,7 @@ class AudioUnitGeneratorSample: AUAudioUnit {
         
         // バスのフォーマットに応じてKernelにバッファを作成する
         let bus = self.outputBusses[0]
-        _kernel.buffer.value = AVAudioPCMBuffer(PCMFormat: bus.format, frameCapacity: self.maximumFramesToRender)
+        _kernel.buffer.value = AVAudioPCMBuffer(pcmFormat: bus.format, frameCapacity: self.maximumFramesToRender)
     }
     
     override func deallocateRenderResources() {

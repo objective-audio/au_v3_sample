@@ -30,15 +30,19 @@ class GeneratorViewController: UIViewController {
         let engine = AVAudioEngine()
         self.audioEngine = engine
         
+        AudioUnitGeneratorSample.registerSubclassOnce
+        
         // AVAudioUnitをインスタンス化する。生成処理が終わるとcompletionHandlerが呼ばれる
-        AVAudioUnit.instantiateWithComponentDescription(AudioUnitGeneratorSample.audioComponentDescription, options: AudioComponentInstantiationOptions(rawValue: 0)) { (audioUnitNode: AVAudioUnit?, err: ErrorType?) -> Void in
+        AVAudioUnit.instantiate(with: AudioUnitGeneratorSample.audioComponentDescription, options: AudioComponentInstantiationOptions(rawValue: 0)) { (audioUnitNode: AVAudioUnit?, err: Error?) -> Void in
             guard let audioUnitNode = audioUnitNode else {
-                print(err)
+                if let err = err {
+                    print(err)
+                }
                 return
             }
             
             // Generatorの処理。サイン波を鳴らす
-            let generatorUnit = audioUnitNode.AUAudioUnit as! AudioUnitGeneratorSample
+            let generatorUnit = audioUnitNode.auAudioUnit as! AudioUnitGeneratorSample
             
             var phase: Float64 = 0.0
             
@@ -46,17 +50,19 @@ class GeneratorViewController: UIViewController {
                 // このブロックの中はオーディオのスレッドから呼ばれる
                 let format = buffer.format
                 let currentPhase: Float64 = phase
-                let phasePerFrame: Float64 = 1000.0 / format.sampleRate * 2.0 * M_PI;
+                let phasePerFrame: Float64 = 1000.0 / format.sampleRate * 2.0 * Double.pi;
                 for ch in 0..<format.channelCount {
-                    phase = fillSine(buffer.floatChannelData[Int(ch)], length: buffer.frameLength, startPhase: currentPhase, phasePerFrame: phasePerFrame)
+                    if let channelData = buffer.floatChannelData {
+                        phase = fillSine(channelData[Int(ch)], length: buffer.frameLength, startPhase: currentPhase, phasePerFrame: phasePerFrame)
+                    }
                 }
             }
             
             // ノードを追加
-            engine.attachNode(audioUnitNode)
+            engine.attach(audioUnitNode)
             
             let sampleRate: Double = AVAudioSession.sharedInstance().sampleRate
-            let format: AVAudioFormat = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)
+            let format: AVAudioFormat = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 2)!
             
             // 接続
             engine.connect(audioUnitNode, to: engine.mainMixerNode, format: format)

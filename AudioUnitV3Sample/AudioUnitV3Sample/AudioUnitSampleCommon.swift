@@ -9,22 +9,22 @@
 import AVFoundation
 import Accelerate
 
-func hfsTypeCode(fileTypeString: String) -> OSType
+func hfsTypeCode(_ fileTypeString: String) -> OSType
 {
     var result: OSType = 0
     var i: UInt32 = 0
     
     for uc in fileTypeString.unicodeScalars {
         result |= OSType(uc) << ((3 - i) * 8)
-        ++i
+        i += 1
     }
     
     return result;
 }
 
-func fillSine(out_data: UnsafeMutablePointer<Float32>, length: AVAudioFrameCount, startPhase: Float64, phasePerFrame: Float64) -> Float64
+func fillSine(_ out_data: UnsafeMutablePointer<Float32>, length: AVAudioFrameCount, startPhase: Float64, phasePerFrame: Float64) -> Float64
 {
-    if (out_data == nil || length == 0) {
+    if (length == 0) {
         return startPhase;
     }
     
@@ -32,7 +32,7 @@ func fillSine(out_data: UnsafeMutablePointer<Float32>, length: AVAudioFrameCount
     
     for i in 0..<length {
         out_data[Int(i)] = Float32(phase)
-        phase = fmod(phase + phasePerFrame, 2.0 * M_PI)
+        phase = fmod(phase + phasePerFrame, 2.0 * Double.pi)
     }
     
     let len = [Int32(length)]
@@ -41,7 +41,7 @@ func fillSine(out_data: UnsafeMutablePointer<Float32>, length: AVAudioFrameCount
     return phase;
 }
 
-public typealias KernelRenderBlock = (buffer: AVAudioPCMBuffer) -> Void
+public typealias KernelRenderBlock = (_ buffer: AVAudioPCMBuffer) -> Void
 
 class Atomic<T> {
     init(val: T) {
